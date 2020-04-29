@@ -5,9 +5,47 @@ export const clearInput = () => {
     }
 export const clearResults = () => {
     elements.searchResultList.innerHTML = "";
+    elements.searchResPage.innerHTML ="";
 };
-export const renderResults = recipes => {
-    recipes.forEach(element => {
+const limitRecipeTitle = (title,limit = 17) => {
+    const tempArray = [];
+    if(title.length > limit){
+        title.split(' ').reduce((acc,curr) =>{
+            if(acc + curr.length <= limit){
+                tempArray.push(curr);
+            }
+            return acc + curr.length;
+        },0);
+    }
+    return `${tempArray.join(' ')}...`;
+}
+const createButton = (page,type) => {
+        return  `
+                <button class="btn-inline results__btn--${type}" data-goto="${type === 'next'? page +1: page -1}">
+                    <span>Page ${type ==='prev' ? page -1 : page + 1}</span>
+                    <svg class="search__icon">
+                        <use href="img/icons.svg#icon-triangle-${type == 'next'?'right' : 'left'}"></use>
+                    </svg>
+                </button>` };
+
+const renderButtons = (page,numResults,resPerPage) =>{
+    const pages = Math.ceil(numResults/resPerPage);
+    let button;
+    if(page ==1 && pages >1){
+        button = createButton(page,'next');
+    } else if (page < pages){
+        button = `${createButton(page,'prev')}
+        ${createButton(page,'next')}
+        `;
+    } else if (pages == pages && pages >1){
+        button = createButton(page,'prev');
+    }
+    elements.searchResPage.insertAdjacentHTML('afterbegin',button);
+}
+export const renderResults = (recipes,page =1, resPerPage =10) => {
+    const start = (page-1) * resPerPage;
+    const end = page * resPerPage;
+    recipes.slice(start,end).forEach(element => {
         const markup = `
         <li>
             <a class="results__link" href="#${element.recipe_id}">
@@ -22,4 +60,5 @@ export const renderResults = recipes => {
         </li>`;
         elements.searchResultList.insertAdjacentHTML('beforeend',markup);
     });
+    renderButtons(page,recipes.length,resPerPage);
 }
