@@ -1,6 +1,7 @@
 // Global app controller
 import Search from './models/Search'
 import * as SearchView from './views/searchView'
+import * as RecipeView from './views/recipeView'
 import {elements, renderLoader,clearLoader} from './views/base'
 import Recipe from './models/Recipe';
 const state ={};
@@ -36,13 +37,15 @@ const controlRecipe =() =>{
     const id = window.location.hash.replace('#','');
     if (id){
         state.recipe = new Recipe(id);
+        renderLoader(elements.recipe);
         state.recipe.getRecipe().then(() =>{
             state.recipe.calcTime();
             state.recipe.calcServings();
-            console.log(state.recipe);
-        }).catch(err => {
-            alert('error processing recipe');
-        });
+            state.recipe.parseIngredients();
+            RecipeView.clearRecipe();
+            clearLoader();
+            RecipeView.renderRecipe(state.recipe);
+        })
         
     }
 }
