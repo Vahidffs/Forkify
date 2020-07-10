@@ -7,7 +7,10 @@ export const clearResults = () => {
     elements.searchResultList.innerHTML = "";
     elements.searchResPage.innerHTML ="";
 };
-const limitRecipeTitle = (title,limit = 17) => {
+export const highlightSelected = id => {
+    document.querySelector(`.results__link[href="${id}"]`).classList.add('result__link--active');
+}
+export const limitRecipeTitle = (title,limit = 17) => {
     const tempArray = [];
     if(title.length > limit){
         title.split(' ').reduce((acc,curr) =>{
